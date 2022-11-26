@@ -1,0 +1,23 @@
+{% extends "index.html" %}
+
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+{% include 'messages.html' %}
+
+{% load crispy_forms_tags %} 
+
+<form method="post" action="">
+    {% csrf_token %}
+    <div class="form-group ">
+      {{form|crispy}}
+    </div>
+   
+   
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+
+
+{% endblock %}
