@@ -150,19 +150,22 @@ function thats going to get the shortlink and redirect user to the tall link
 def visitLink(request,pk):
     unqiqueLink = "http://127.0.0.1:8000/" + pk
 
-    #get all links the data related to the user
-    try:
-        shortLink = Urls.objects.filter(user=request.user).get(uuid=unqiqueLink)
-    except:
-        messages.error(request, "Link isnt in database!")
-        return HttpResponseRedirect("/")
+    if request.user.is_authenticated:
+
+        #get all links the data related to the user
+        try:
+            shortLink = Urls.objects.filter(user=request.user).get(uuid=unqiqueLink)
+        except:
+            messages.error(request, "Link isnt in database!")
+            return HttpResponseRedirect("/")
     
     #get tall Link associated new_link
-    associatedLink = shortLink.userLink
-    return redirect(associatedLink)
+        associatedLink = shortLink.userLink
+        return redirect(associatedLink)
 
     #redirect back to tall link
-    #return HttpResponseRedirect("/")
+    messages.error(request, "Login First to do this")
+    return HttpResponseRedirect("login")
 
 
 
