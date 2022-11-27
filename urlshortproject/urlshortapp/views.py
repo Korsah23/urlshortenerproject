@@ -84,13 +84,23 @@ function to display the sign up page to the user
 """
 def signup(request):
     if request.method == "POST":
+
+        #get data from form
         form = UserForm(request.POST)
+
+        #check if form is valid
         if form.is_valid():
+
+            #save form to database
             form.save()
+
+            #return user to login page
             return HttpResponseRedirect('login')
         else:
+            #return user to signup page
             return render(request, "signup.html", {"form": form})
-            
+
+    #if request is get, return signup form     
     form = UserForm
     return render(request, "signup.html", {"form": form})
 
@@ -120,22 +130,37 @@ def Login(request):
     form = AuthenticationForm()
     return render(request, "login.html",{"form":form})
 
-
+"""
+Function that queries the data an output the user long and short link to the user. 
+"""
 
 def dashboard(request):
-    if request.user.is_authenticated:
-        if request.method == "POST":
 
+    #check if user is logged in
+    if request.user.is_authenticated:
+
+        if request.method == "POST":
+            
+            #get urls related to the user
             urls = Urls.objects.filter(user = request.user)
-        
+
+            #show user dashboard with data
             return render(request,"dashboard.html",{"urls":urls})
         
+        #if get request
+        #if user is authenticated, return the dashboard with user data
         urls = Urls.objects.filter(user = request.user)
         return render(request,"dashboard.html",{"urls":urls})
     else:
+        #if user isnt logged in
         messages.success(request,"Login First Please")
         return HttpResponseRedirect("login")
 
+"""
+Function that logs user out
+User should be logged in before they can log out
+returns user to home page if logout successful
+"""
 @login_required
 def Logout(request):
     logout(request)
@@ -150,22 +175,21 @@ function thats going to get the shortlink and redirect user to the tall link
 def visitLink(request,pk):
     unqiqueLink = "http://127.0.0.1:8000/" + pk
 
-    if request.user.is_authenticated:
-
         #get all links the data related to the user
-        try:
-            shortLink = Urls.objects.filter(user=request.user).get(uuid=unqiqueLink)
-        except:
-            messages.error(request, "Link isnt in database!")
-            return HttpResponseRedirect("/")
+    try:
+        shortLink = Urls.objects.get(uuid=unqiqueLink)
+    except:
+        messages.error(request, "Link isnt in database!")
+
+        #return user back to home page
+        return HttpResponseRedirect("/")
     
     #get tall Link associated new_link
-        associatedLink = shortLink.userLink
-        return redirect(associatedLink)
+    associatedLink = shortLink.userLink
 
-    #redirect back to tall link
-    messages.error(request, "Login First to do this")
-    return HttpResponseRedirect("login")
+    #reirect to original page
+    return redirect(associatedLink)
+
 
 
 
